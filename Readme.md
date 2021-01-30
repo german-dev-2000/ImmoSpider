@@ -26,7 +26,7 @@ With this information you can now start Immospider like
 You should be able to scrape all results within 30 seconds. The results will be stored as CSV file
 `apartments.csv`.
 
-## Scraping at regular intervals with telegran alarm
+## Scraping at regular intervals with Telegram alarm
 
 ### Prerequisites
 
