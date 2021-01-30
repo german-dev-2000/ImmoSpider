@@ -17,10 +17,10 @@ class SendTelegram(object):
     def from_crawler(cls, crawler):
 
         settings = crawler.settings
-		tg_bot_key = settings.get("TG_BOT_KEY")
-		tg_chat_id = settings.get("TG_CHAT_ID")
+        tg_bot_key = settings.get("TG_BOT_KEY")
+        tg_chat_id = settings.get("TG_CHAT_ID")
 
-		ext = cls()
+        ext = cls()
 
         crawler.signals.connect(ext.spider_closed, signal=signals.spider_closed)
         crawler.signals.connect(ext.item_scraped, signal=signals.item_scraped)
@@ -33,7 +33,7 @@ class SendTelegram(object):
         if len(self.items) > 0:
 
             message = ""
-			http = urllib3.PoolManager()
+            http = urllib3.PoolManager()
             for item in sorted(self.items, key=lambda item: float(item["rent"]), reverse=True):
                 message += str(item["title"]) + "\n"
                 message += "€" + str(item["rent"]) + "\n"
@@ -41,7 +41,7 @@ class SendTelegram(object):
                 http.request("GET", "https://api.telegram.org/" +
                                 "bot" + tg_bot_key +
                                 "sendMessage?chat_id=" + tg_chat_id + 
-								"&text=" + message)
+                                "&text=" + message)
                 message = ""
         else:
             logger.info("No new items found. No telegram sent.")
@@ -52,59 +52,59 @@ class SendTelegram(object):
 
 class SendMail(object):
 
-	def __init__(self, fromaddr, to, sendgrid_key):
-		self.fromaddr = fromaddr
-		self.toaddr = to
-		self.sendgrid_key = sendgrid_key
-		self.items = []
+    def __init__(self, fromaddr, to, sendgrid_key):
+        self.fromaddr = fromaddr
+        self.toaddr = to
+        self.sendgrid_key = sendgrid_key
+        self.items = []
 
-	@classmethod
-	def from_crawler(cls, crawler):
+    @classmethod
+    def from_crawler(cls, crawler):
 
-		settings = crawler.settings
-		fromaddr = settings.get("FROM")
-		toaddr = settings.get("TO")
-		sendgrid_key = settings.get("SENDGRID_API_KEY")
+        settings = crawler.settings
+        fromaddr = settings.get("FROM")
+        toaddr = settings.get("TO")
+        sendgrid_key = settings.get("SENDGRID_API_KEY")
 
-		ext = cls(fromaddr, toaddr, sendgrid_key)
+        ext = cls(fromaddr, toaddr, sendgrid_key)
 
-		crawler.signals.connect(ext.spider_closed, signal=signals.spider_closed)
-		crawler.signals.connect(ext.item_scraped, signal=signals.item_scraped)
+        crawler.signals.connect(ext.spider_closed, signal=signals.spider_closed)
+        crawler.signals.connect(ext.item_scraped, signal=signals.item_scraped)
 
-		return ext
+        return ext
 
-	def spider_closed(self, spider):
+    def spider_closed(self, spider):
 
-		if len(self.items) > 0:
+        if len(self.items) > 0:
 
-			sg = sendgrid.SendGridAPIClient(self.sendgrid_key)
+            sg = sendgrid.SendGridAPIClient(self.sendgrid_key)
 
-			from_email = Email(self.fromaddr)
-			to_email = Email(self.toaddr)
-			subject = "New Items from Immospider"
+            from_email = Email(self.fromaddr)
+            to_email = Email(self.toaddr)
+            subject = "New Items from Immospider"
 
-			# message = "Hi there,\r\n\r\nhere are all new items from Immospider:\r\n"
-			# message += "\r\n".join([str(item["url"]) +" "+ str(item["rent"]) +"€ "+ str(item["title"]) for item in sorted(self.items, key = lambda item: float(item["rent"]), reverse=True)])
-			# # for pure plain text messages one has to deactivate auto-convert to html in sendgrid mail settings
-			# # https://github.com/sendgrid/sendgrid-nodejs/issues/623
-			# content = Content("text/plain", message)
+            # message = "Hi there,\r\n\r\nhere are all new items from Immospider:\r\n"
+            # message += "\r\n".join([str(item["url"]) +" "+ str(item["rent"]) +"€ "+ str(item["title"]) for item in sorted(self.items, key = lambda item: float(item["rent"]), reverse=True)])
+            # # for pure plain text messages one has to deactivate auto-convert to html in sendgrid mail settings
+            # # https://github.com/sendgrid/sendgrid-nodejs/issues/623
+            # content = Content("text/plain", message)
 
-			html = "Hi there,<br /><br />here are all new items from Immospider:<br />"
-			html += "<br />".join(
-				["<a href=\"" + str(item["url"]) + "\">" + str(item["rent"]) + "€ " + str(item["title"]) + "</a>" for
-				 item in sorted(self.items, key=lambda item: float(item["rent"]), reverse=True)])
+            html = "Hi there,<br /><br />here are all new items from Immospider:<br />"
+            html += "<br />".join(
+                ["<a href=\"" + str(item["url"]) + "\">" + str(item["rent"]) + "€ " + str(item["title"]) + "</a>" for
+                 item in sorted(self.items, key=lambda item: float(item["rent"]), reverse=True)])
 
-			content = Content("text/html", html)
+            content = Content("text/html", html)
 
-			mail = Mail(from_email, subject, to_email, content)
+            mail = Mail(from_email, subject, to_email, content)
 
-			response = sg.client.mail.send.post(request_body=mail.get())
-			logger.info(response.status_code)
-			logger.info(response.body)
-			logger.info(response.headers)
-		else:
-			logger.info("No new items found. No email sent.")
+            response = sg.client.mail.send.post(request_body=mail.get())
+            logger.info(response.status_code)
+            logger.info(response.body)
+            logger.info(response.headers)
+        else:
+            logger.info("No new items found. No email sent.")
 
-	def item_scraped(self, item, spider):
-		self.items.append(item)
+    def item_scraped(self, item, spider):
+        self.items.append(item)
 
