@@ -1,6 +1,6 @@
 # Immospider
 Immospider is a python program that crawls the Immoscout24 website. You can also use it to 
-immediately receive an email when new apartments are available at the Immoscout24 website. 
+immediately receive a Telegram message or an email when new apartments are available at the Immoscout24 website. 
 It is based on ideas from <http://mfcabrera.com/data_science/2015/01/17/ichbineinberliner.html> 
 and <https://github.com/balzer82/immoscraper> .
 
@@ -26,24 +26,56 @@ With this information you can now start Immospider like
 You should be able to scrape all results within 30 seconds. The results will be stored as CSV file
 `apartments.csv`.
 
-## Scraping at regular intervals with Telegram alarm
+## Scraping at regular intervals with email alarm
 
 ### Prerequisites
 
 - Docker
 - Telegram bot registered via [@BotFather](https://t.me/botfather)
+- Chat ID extracted from `https://api.telegram.org/bot<your bot token>/getUpdates`
+  - To get it you need to initiate the conversation with your bot
 
 ### Configuration
-Start your Telegram bot by writing him a private message or adding him to a group chat.
-Extract the chat id you want use using the following URL:
-`https://api.telegram.org/bot<your bot token>/getUpdates`
-
 Make a copy of `config.tmpl` and rename it to `config`. Edit `config` and 
 file out the following environment variables: 
 
     URL=<your immoscout search url>
-    TG_BOT_KEY=<your bot token>
-    TG_CHAT_ID=<your chat ID>
+    TG_BOT_TOKEN=${TG_BOT_TOKEN}
+    TG_CHAT_ID=${TG_CHAT_ID}
+
+
+By default Immospider is configured to run every 10 minutes. To change it edit the
+file `yacrontab.yaml` and edit the line
+
+    schedule: "*/10 * * * *"
+    
+### Usage
+To create the docker container and run it with your configuration do
+
+    $ sh run_docker.sh
+    
+This will create a docker container from the `Dockerfile`, install the dependencies
+and Immospider into the container and run it with your configuration. It will scrape
+the Immoscout24 in regular intervals, store the results and will send out an email
+when it detects new results it hasn't seen before. Neat, isn't it?
+
+
+## Scraping at regular intervals with email alarm
+
+### Prerequisites
+
+- Docker
+- Account at SendGrid (for sending out email)
+
+### Configuration
+Make a copy of `config.tmpl` and rename it to `config`. Edit `config` and 
+file out the following environment variables: 
+
+    URL=<your immoscout search url>
+    FROM=<from email address>
+    TO=<to email address>
+    SENDGRID_API_KEY=<your sendgrid API key>
+    
 
 By default Immospider is configured to run every 10 minutes. To change it edit the
 file `yacrontab.yaml` and edit the line
@@ -140,6 +172,5 @@ notebooks
 - [ImmoPredict.ipynb](https://nbviewer.jupyter.org/github/asmaier/ImmoSpider/blob/master/immoscience/ImmoPredict.ipynb) .
 - [ApartmentsPredict.ipynb](https://nbviewer.jupyter.org/github/asmaier/ImmoSpider/blob/master/immoscience/ApartmentsPredict.ipynb) .
 - [ImmoPredictHouses.ipynb](https://nbviewer.jupyter.org/github/asmaier/ImmoSpider/blob/master/immoscience/ImmoPredictHouses.ipynb) .
-
 
 

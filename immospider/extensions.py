@@ -1,7 +1,7 @@
 import sendgrid
 from sendgrid.helpers.mail import *
 import logging
-from scrapy import signal
+from scrapy import signals
 import urllib3
 
 
@@ -17,7 +17,7 @@ class SendTelegram(object):
     def from_crawler(cls, crawler):
 
         settings = crawler.settings
-        tg_bot_key = settings.get("TG_BOT_KEY")
+        tg_bot_key = settings.get("TG_BOT_TOKEN")
         tg_chat_id = settings.get("TG_CHAT_ID")
 
         ext = cls()

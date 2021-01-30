@@ -10,6 +10,8 @@ jobs:
         -s FROM=${FROM}
         -s TO=${TO}
         -s SENDGRID_API_KEY=${SENDGRID_API_KEY}
+        -s TG_BOT_TOKEN=${TG_BOT_TOKEN}
+        -s TG_CHAT_ID=${TG_CHAT_ID}
         -s LOG_LEVEL=INFO
         -a url=${URL}  
     schedule: "*/10 * * * *"
