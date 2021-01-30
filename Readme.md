@@ -36,7 +36,7 @@ You should be able to scrape all results within 30 seconds. The results will be 
 ### Configuration
 Start your Telegram bot by writing him a private message or adding him to a group chat.
 Extract the chat id you want use using the following URL:
-`https://api.telegram.org/bot&lt;your bot token&gt;/getUpdates`
+`https://api.telegram.org/bot<your bot token>/getUpdates`
 
 Make a copy of `config.tmpl` and rename it to `config`. Edit `config` and 
 file out the following environment variables: 
