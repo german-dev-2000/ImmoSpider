@@ -26,21 +26,24 @@ With this information you can now start Immospider like
 You should be able to scrape all results within 30 seconds. The results will be stored as CSV file
 `apartments.csv`.
 
-## Scraping at regular intervals with email alarm
+## Scraping at regular intervals with telegran alarm
 
 ### Prerequisites
 
 - Docker
-- Account at SendGrid (for sending out email)
+- Telegram bot registered via [@BotFather](https://t.me/botfather)
 
 ### Configuration
+Start your Telegram bot by writing him a private message or adding him to a group chat.
+Extract the chat id you want use using the following URL:
+https://api.telegram.org/bot<your bot token>/getUpdates
+
 Make a copy of `config.tmpl` and rename it to `config`. Edit `config` and 
 file out the following environment variables: 
 
     URL=<your immoscout search url>
-    FROM=<from email address>
-    TO=<to email address>
-    SENDGRID_API_KEY=<your sendgrid API key>
+    TG_BOT_KEY=<your bot token>
+    TG_CHAT_ID=<your chat ID>
 
 By default Immospider is configured to run every 10 minutes. To change it edit the
 file `yacrontab.yaml` and edit the line

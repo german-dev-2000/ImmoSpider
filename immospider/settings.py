@@ -61,7 +61,8 @@ ROBOTSTXT_OBEY = True
 # Enable or disable extensions
 # See http://scrapy.readthedocs.org/en/latest/topics/extensions.html
 EXTENSIONS = {
-     'immospider.extensions.SendMail': 100,	
+     'immospider.extensions.SendTelegram': 100,
+#     'immospider.extensions.SendMail': 100,	
 #    'scrapy.extensions.telnet.TelnetConsole': None,
 }
 

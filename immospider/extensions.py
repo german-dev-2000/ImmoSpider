@@ -1,10 +1,53 @@
 import sendgrid
 from sendgrid.helpers.mail import *
 import logging
-from scrapy import signals
+from scrapy import signal
+import urllib3
 
 
 logger = logging.getLogger(__name__)
+
+
+class SendTelegram(object):
+
+    def __init__(self):
+        self.items = []
+
+    @classmethod
+    def from_crawler(cls, crawler):
+
+        settings = crawler.settings
+		tg_bot_key = settings.get("TG_BOT_KEY")
+		tg_chat_id = settings.get("TG_CHAT_ID")
+
+		ext = cls()
+
+        crawler.signals.connect(ext.spider_closed, signal=signals.spider_closed)
+        crawler.signals.connect(ext.item_scraped, signal=signals.item_scraped)
+
+        return ext
+
+
+    def spider_closed(self, spider):
+
+        if len(self.items) > 0:
+
+            message = ""
+			http = urllib3.PoolManager()
+            for item in sorted(self.items, key=lambda item: float(item["rent"]), reverse=True):
+                message += str(item["title"]) + "\n"
+                message += "€" + str(item["rent"]) + "\n"
+                message += str(item["url"])
+                http.request("GET", "https://api.telegram.org/" +
+                                "bot" + tg_bot_key +
+                                "sendMessage?chat_id=" + tg_chat_id + 
+								"&text=" + message)
+                message = ""
+        else:
+            logger.info("No new items found. No telegram sent.")
+
+    def item_scraped(self, item, spider):
+        self.items.append(item)
 
 
 class SendMail(object):
